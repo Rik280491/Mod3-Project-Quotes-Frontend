@@ -1,0 +1,19 @@
+body {
+    text-align-last: center;
+    font-family: monospace;
+  }
+
+h1 {
+    font-size: 3.5em;
+}
+
+.card {
+    text-align: center;
+    border: grey solid 1px;
+    padding: 1rem;
+    width: 15rem;
+    height: 5rem;
+    display: inline-grid;
+    margin: 1rem 1rem;
+    box-shadow: 3px 4px hotpink
+  }
