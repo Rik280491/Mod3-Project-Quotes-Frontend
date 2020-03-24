@@ -26,7 +26,7 @@ const renderLanding = () => {
 };
 
 const singQuote = quotes => {
-  i = 0, i++ 
+   i = 0, i++ // needs to be random
   fetch(`${QUOTES_API}/${i}`).then(resp => resp.json())
   .then(quote => renderQuote(quote));
 };
@@ -38,6 +38,7 @@ const singAuthor = authors => {
 const renderAuthor = author => {
   
   const image = document.createElement("img");
+  
   image.src = author.img_url;
  
   body.append(image);
@@ -49,7 +50,10 @@ const renderQuote = quote => {
   const quoteContent = document.createElement("p");
   quoteContent.innerText = quote.content;
   
-  quoteCard.append(quoteContent);
+  const authorImage = document.createElement("img")
+  authorImage.src = quote.author.img_url
+
+  quoteCard.append(quoteContent, authorImage);
   body.append(quoteCard);
 
   
