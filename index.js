@@ -1,6 +1,7 @@
 const QUOTES_API = "http://localhost:3000/quotes";
 const AUTHORS_API = "http://localhost:3000/authors";
 
+
 const API = {
   getQuotes: () => fetch(QUOTES_API).then(resp => resp.json()),
 
@@ -25,8 +26,9 @@ const renderLanding = () => {
 };
 
 const singQuote = quotes => {
-  debugger;
-  quotes.forEach(quote => renderQuote(quote));
+   i = 0, i++ // needs to be random
+  fetch(`${QUOTES_API}/${i}`).then(resp => resp.json())
+  .then(quote => renderQuote(quote));
 };
 
 const singAuthor = authors => {
@@ -34,9 +36,11 @@ const singAuthor = authors => {
 };
 
 const renderAuthor = author => {
+  
   const image = document.createElement("img");
+  
   image.src = author.img_url;
-
+ 
   body.append(image);
 };
 
@@ -45,9 +49,14 @@ const renderQuote = quote => {
   quoteCard.className = "card";
   const quoteContent = document.createElement("p");
   quoteContent.innerText = quote.content;
+  
+  const authorImage = document.createElement("img")
+  authorImage.src = quote.author.img_url
 
-  quoteCard.append(quoteContent);
+  quoteCard.append(quoteContent, authorImage);
   body.append(quoteCard);
+
+  
 };
 
 const renderGame = () => {
