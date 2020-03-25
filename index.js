@@ -1,6 +1,7 @@
 const QUOTES_API = "http://localhost:3000/quotes";
 const AUTHORS_API = "http://localhost:3000/authors";
 
+
 const API = {
   getQuotes: () => fetch(QUOTES_API).then(resp => resp.json()),
 
@@ -25,10 +26,12 @@ const renderLanding = () => {
 };
 
 const singQuote = quotes => {
+
   (i = 0), i++; // needs to be random
   fetch(`${QUOTES_API}/${i}`)
     .then(resp => resp.json())
-    .then(quote => renderQuote(quote));
+    .then(quote => renderQuote(quote))
+   
 };
 
 const singAuthor = authors => {
@@ -39,6 +42,7 @@ const singAuthor = authors => {
 };
 
 const renderAuthor = author => {
+
   const imageContainerA = document.querySelector("#image-container-a")
   const image = document.createElement("img");
 
@@ -60,6 +64,10 @@ const renderQuote = quote => {
   quoteCard.className = "card";
   const quoteContent = document.createElement("p");
   quoteContent.innerText = quote.content;
+  
+  const authorImage = document.createElement("img")
+  authorImage.src = quote.author.img_url
+
 
   const imageContainerB = document.querySelector("#image-container-b")
   const authorImage = document.createElement("img");
