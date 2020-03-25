@@ -42,5 +42,5 @@ const getNewQuote = () => {
     const quoteIndex = Math.floor(Math.random()*availableQuotes.length);
     currentQuote = availableQuotes[quoteIndex];
     quoteCard.innerText = currentQuote.content
-    
+
 }

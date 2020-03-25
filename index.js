@@ -18,15 +18,15 @@ const renderLanding = () => {
   gameBtn.innerText = "Start";
 
   gameBtn.addEventListener("click", () => {
-    renderGame();
+    startGame();
   });
 
   landingPage.append(title, gameBtn);
 };
 
 const singQuote = quotes => {
-  debugger;
   quotes.forEach(quote => renderQuote(quote));
+    // debugger
 };
 
 const singAuthor = authors => {
@@ -41,6 +41,7 @@ const renderAuthor = author => {
 };
 
 const renderQuote = quote => {
+  
   const quoteCard = document.createElement("div");
   quoteCard.className = "card";
   const quoteContent = document.createElement("p");
@@ -50,9 +51,11 @@ const renderQuote = quote => {
   body.append(quoteCard);
 };
 
-const renderGame = () => {
+const startGame = () => {
   landingPage.innerHTML = "";
-  API.getQuotes().then(quotes => singQuote(quotes));
-  API.getAuthors().then(authors => singAuthor(authors));
+  API.getQuotes().then(quotes => singQuote(quotes)); // Race condition
+  API.getAuthors().then(authors => singAuthor(authors)); // Race condition
+
+  API.nextQuote().then( singleQuote => renderQuote(singleQuote) )
 };
 renderLanding();
