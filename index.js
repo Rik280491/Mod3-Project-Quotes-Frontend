@@ -26,22 +26,37 @@ const renderLanding = () => {
 };
 
 const singQuote = quotes => {
-   i = 0, i++ // needs to be random
-  fetch(`${QUOTES_API}/${i}`).then(resp => resp.json())
-  .then(quote => renderQuote(quote));
+
+  (i = 0), i++; // needs to be random
+  fetch(`${QUOTES_API}/${i}`)
+    .then(resp => resp.json())
+    .then(quote => renderQuote(quote))
+   
 };
 
 const singAuthor = authors => {
-  authors.forEach(author => renderAuthor(author));
+  (i = 1), i++; //needs to be random. works(no duplicate photo) if counter starts at 1. Too hacky for my liking (would eventually fail when we do random numbers)
+  fetch(`${AUTHORS_API}/${i}`)
+    .then(resp => resp.json())
+    .then(author => renderAuthor(author));
 };
 
 const renderAuthor = author => {
-  
+
+  const imageContainerA = document.querySelector("#image-container-a")
   const image = document.createElement("img");
+
+  // same author, doesn't work, how can i call quote.author_id?
   
+  // if (author.id === author.quotes.author_id) {             
+  //     image.innerText = "Hello"
+  // } else {
+  //     image.src = author.img_url;
+  // }
+
   image.src = author.img_url;
- 
-  body.append(image);
+
+  imageContainerA.append(image);
 };
 
 const renderQuote = quote => {
@@ -53,10 +68,15 @@ const renderQuote = quote => {
   const authorImage = document.createElement("img")
   authorImage.src = quote.author.img_url
 
-  quoteCard.append(quoteContent, authorImage);
-  body.append(quoteCard);
 
+  const imageContainerB = document.querySelector("#image-container-b")
+  const authorImage = document.createElement("img");
+  authorImage.src = quote.author.img_url;
+
+  imageContainerB.append(authorImage)
+  quoteCard.append(quoteContent);
   
+ body.append(quoteCard, imageContainerB);
 };
 
 const renderGame = () => {
