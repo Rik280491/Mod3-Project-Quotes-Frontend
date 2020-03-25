@@ -5,15 +5,17 @@ body {
 
 h1 {
     font-size: 3.5em;
+    animation: pulse 1s infinite;
 }
 
 .card {
     text-align: center;
     border: grey solid 1px;
     padding: 1rem;
-    width: 15rem;
-    height: 5rem;
-    display: inline-grid;
+    width: auto;
+    height: auto;
+    display: center;
     margin: 1rem 1rem;
     box-shadow: 3px 4px hotpink
   }
+

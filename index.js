@@ -1,18 +1,19 @@
-const QUOTES_API = "http://localhost:3000/quotes";
-const AUTHORS_API = "http://localhost:3000/authors";
+const START_GAME_API = "http://localhost:3000/start-game";
 
 const API = {
-  getQuotes: () => fetch(QUOTES_API).then(resp => resp.json()),
-
-  getAuthors: () => fetch(AUTHORS_API).then(response => response.json()),
-  getAuthor: (i) => fetch(`${AUTHORS_API}/${i}`).then(response => response.json())
+  init: () => fetch(START_GAME_API).then(resp => resp.json())
 };
 
-const body = document.querySelector("body");
+const gameElements = document.querySelector("#game-elements");
 const landingPage = document.querySelector("#landing-page");
+const imageContainerB = document.querySelector("#image-container-b");
+const imageContainerA = document.querySelector("#image-container-a");
+
+let i = 0;
 
 const renderLanding = () => {
   const title = document.createElement("h1");
+  title.class = "animated";
   title.innerText = "Who said it??";
 
   const gameBtn = document.createElement("button");
@@ -25,44 +26,61 @@ const renderLanding = () => {
   landingPage.append(title, gameBtn);
 };
 
-const singQuote = quotes => {
-   i = 0, i++ // needs to be random
-  fetch(`${QUOTES_API}/${i}`).then(resp => resp.json())
-  .then(quote => renderQuote(quote));
-};
-
-const singAuthor = () => {
-  i = 1, i++,
-  API.getAuthor().then(author => renderAuthor(author))
-};
-
-const renderAuthor = author => {
-  
-  const image = document.createElement("img");
-  
-  image.src = author.img_url;
- 
-  body.append(image);
-};
-
-const renderQuote = quote => {
-  const quoteCard = document.createElement("div");
-  quoteCard.className = "card";
-  const quoteContent = document.createElement("p");
-  quoteContent.innerText = quote.content;
-  
-  const authorImage = document.createElement("img")
-  authorImage.src = quote.author.img_url
-
-  quoteCard.append(quoteContent, authorImage);
-  body.append(quoteCard);
-
-  
-};
-
 const renderGame = () => {
   landingPage.innerHTML = "";
-  API.getQuotes().then(quotes => singQuote(quotes));
-  API.getAuthors().then(authors => singAuthor(authors));
+  API.init().then(data => getNewRound(data));
 };
+
+const getNewRound = data => {
+  console.log(data[0]);
+  console.log(i);
+  debugger;
+
+  const matchID = data => {
+    return data[0].quotes.map(quote => quote.author_id);
+  } 
+
+  const quoteCard = document.createElement("div");
+  quoteCard.className = "card";
+
+  const quoteContent = document.createElement("p");
+  // quoteContent.innerText = data[0].quotes.find(quote => quote.author_id)[i].content;
+  quoteContent.innerText = data[0].quotes.find(quote => quote.author_id === matchID(data)[i]).content
+
+  const imageA = document.createElement("img");
+  imageA.src = data[0].authors.find(author => author.id === matchID(data)[i]).img_url;
+
+  const imageB = document.createElement("img");
+  imageB.src = data[0].authors.find(
+    author =>
+      author.id === Math.floor(Math.random() * data[0].authors.length + 1)
+  ).img_url;
+
+  imageContainerA.append(imageA);
+  quoteCard.append(quoteContent);
+  imageContainerB.append(imageB);
+  gameElements.append(imageContainerA, quoteCard, imageContainerB);
+
+  imageContainerA.addEventListener("click", () => {
+    alert("Correct");
+    nextRound(imageA, imageB, quoteCard, imageContainerA, imageContainerB, data);
+  });
+
+  imageContainerB.addEventListener("click", () => {
+    alert("wrong");
+    nextRound(imageA, imageB, quoteCard, imageContainerA, imageContainerB, data);
+  });
+};
+
+const nextRound = (imageA, imageB, quoteCard, imageContainerA, imageContainerB, data) => {
+  i++;
+  imageA.remove();
+  imageB.remove();
+  quoteCard.remove();
+  imageContainerA.removeEventListener("click", )
+  // imageContainerB.removeEventListener("click",  )
+  //remove event listeners
+  getNewRound(data);
+};
+
 renderLanding();
