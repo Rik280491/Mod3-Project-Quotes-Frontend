@@ -4,7 +4,8 @@ const AUTHORS_API = "http://localhost:3000/authors";
 const API = {
   getQuotes: () => fetch(QUOTES_API).then(resp => resp.json()),
 
-  getAuthors: () => fetch(AUTHORS_API).then(response => response.json())
+  getAuthors: () => fetch(AUTHORS_API).then(response => response.json()),
+  getAuthor: (i) => fetch(`${AUTHORS_API}/${i}`).then(response => response.json())
 };
 
 const body = document.querySelector("body");
@@ -18,44 +19,50 @@ const renderLanding = () => {
   gameBtn.innerText = "Start";
 
   gameBtn.addEventListener("click", () => {
-    startGame();
+    renderGame();
   });
 
   landingPage.append(title, gameBtn);
 };
 
 const singQuote = quotes => {
-  quotes.forEach(quote => renderQuote(quote));
-    // debugger
+   i = 0, i++ // needs to be random
+  fetch(`${QUOTES_API}/${i}`).then(resp => resp.json())
+  .then(quote => renderQuote(quote));
 };
 
-const singAuthor = authors => {
-  authors.forEach(author => renderAuthor(author));
+const singAuthor = () => {
+  i = 1, i++,
+  API.getAuthor().then(author => renderAuthor(author))
 };
 
 const renderAuthor = author => {
+  
   const image = document.createElement("img");
+  
   image.src = author.img_url;
-
+ 
   body.append(image);
 };
 
 const renderQuote = quote => {
-  
   const quoteCard = document.createElement("div");
   quoteCard.className = "card";
   const quoteContent = document.createElement("p");
   quoteContent.innerText = quote.content;
+  
+  const authorImage = document.createElement("img")
+  authorImage.src = quote.author.img_url
 
-  quoteCard.append(quoteContent);
+  quoteCard.append(quoteContent, authorImage);
   body.append(quoteCard);
+
+  
 };
 
-const startGame = () => {
+const renderGame = () => {
   landingPage.innerHTML = "";
-  API.getQuotes().then(quotes => singQuote(quotes)); // Race condition
-  API.getAuthors().then(authors => singAuthor(authors)); // Race condition
-
-  API.nextQuote().then( singleQuote => renderQuote(singleQuote) )
+  API.getQuotes().then(quotes => singQuote(quotes));
+  API.getAuthors().then(authors => singAuthor(authors));
 };
 renderLanding();
