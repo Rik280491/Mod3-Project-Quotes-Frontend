@@ -36,6 +36,9 @@ const renderLanding = () => {
   landingPage.append(title, gameBtn);
 };
 
+
+};
+
 const renderGame = () => {
   landingPage.innerHTML = "";
   API.init().then(data => getNewRound(data));
@@ -45,6 +48,7 @@ const getNewRound = data => {
   console.log(data[0]);
   console.log(i);
   
+
 
   const matchID = data => {
     return data[0].quotes.map(quote => quote.author_id);
@@ -65,6 +69,18 @@ const getNewRound = data => {
   imageA.className = 'piccy'
   imageA.src = data[0].authors.find(author => author.id === matchID(data)[i]).img_url;
 
+
+
+  const imageContainerB = document.querySelector("#image-container-b")
+  const authorImage = document.createElement("img");
+  authorImage.src = quote.author.img_url;
+
+  imageContainerB.append(authorImage)
+  quoteCard.append(quoteContent);
+  
+ body.append(quoteCard, imageContainerB);
+  
+  
   const imageB = document.createElement("img");
   imageA.className = 'piccy'
   let randomPick = Math.floor(Math.random() * data[0].authors.length)
@@ -87,6 +103,7 @@ const getNewRound = data => {
     nextRound(imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB);
   };
   imageContainerB.addEventListener("click", handleImageB)
+
 };
 
 const nextRound = (imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB) => {
