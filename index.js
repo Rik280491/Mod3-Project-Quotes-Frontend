@@ -1,7 +1,16 @@
 const START_GAME_API = "http://localhost:3000/start-game";
+const GAMES_URL = "http://localhost:3000/games";
 
 const API = {
-  init: () => fetch(START_GAME_API).then(resp => resp.json())
+  init: () => fetch(START_GAME_API).then(resp => resp.json()),
+  postGame: (username, score, quote_ids) => fetch(GAMES_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify({ username, score, quote_ids })
+  })
 };
 
 const gameElements = document.querySelector("#game-elements");
@@ -35,7 +44,7 @@ const renderGame = () => {
 const getNewRound = data => {
   console.log(data[0]);
   console.log(i);
-  debugger;
+  
 
   const matchID = data => {
     return data[0].quotes.map(quote => quote.author_id);
@@ -65,25 +74,35 @@ const getNewRound = data => {
   quoteCard.append(quoteContent);
   imageContainerB.append(imageB);
   gameElements.append(timer, imageContainerA, quoteCard, imageContainerB);
-
-  imageContainerA.addEventListener("click", () => {
+  
+  
+  const handleImageA = () => {
     alert("Correct");
-    nextRound(imageA, imageB, quoteCard, imageContainerA, imageContainerB, data);
-  });
+    nextRound(imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB);
+  };
+  imageContainerA.addEventListener("click", handleImageA)
 
-  imageContainerB.addEventListener("click", () => {
+  const handleImageB = () => {
     alert("wrong");
-    nextRound(imageA, imageB, quoteCard, imageContainerA, imageContainerB, data);
-  });
+    nextRound(imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB);
+  };
+  imageContainerB.addEventListener("click", handleImageB)
 };
 
-const nextRound = (imageA, imageB, quoteCard, imageContainerA, imageContainerB, data) => {
+const nextRound = (imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB) => {
+  console.log("next round", {imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB})
   i++;
+
+  if (i === data[0].quotes.length) {
+    API.postGame("sam", 10, data[0].quotes.map(q => q.id))
+    return;
+  }
+
   imageA.remove();
   imageB.remove();
   quoteCard.remove();
-  imageContainerA.removeEventListener("click", getNewRound);
-  imageContainerB.removeEventListener("click", getNewRound );
+  imageContainerA.removeEventListener("click", handleImageA);
+  imageContainerB.removeEventListener("click", handleImageB );
   //remove event listeners
   getNewRound(data);
 };
