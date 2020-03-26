@@ -1,18 +1,29 @@
-const QUOTES_API = "http://localhost:3000/quotes";
-const AUTHORS_API = "http://localhost:3000/authors";
-
+const START_GAME_API = "http://localhost:3000/start-game";
+const GAMES_URL = "http://localhost:3000/games";
 
 const API = {
-  getQuotes: () => fetch(QUOTES_API).then(resp => resp.json()),
-
-  getAuthors: () => fetch(AUTHORS_API).then(response => response.json())
+  init: () => fetch(START_GAME_API).then(resp => resp.json()),
+  postGame: (username, score, quote_ids) => fetch(GAMES_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify({ username, score, quote_ids })
+  })
 };
 
-const body = document.querySelector("body");
+const gameElements = document.querySelector("#game-elements");
 const landingPage = document.querySelector("#landing-page");
+const imageContainerB = document.querySelector("#image-container-b");
+const imageContainerA = document.querySelector("#image-container-a");
+const timer = document.querySelector('#timer')
+
+let i = 0;
 
 const renderLanding = () => {
   const title = document.createElement("h1");
+  title.class = "animated";
   title.innerText = "Who said it??";
 
   const gameBtn = document.createElement("button");
@@ -25,48 +36,39 @@ const renderLanding = () => {
   landingPage.append(title, gameBtn);
 };
 
-const singQuote = quotes => {
 
-  (i = 0), i++; // needs to be random
-  fetch(`${QUOTES_API}/${i}`)
-    .then(resp => resp.json())
-    .then(quote => renderQuote(quote))
-   
 };
 
-const singAuthor = authors => {
-  (i = 1), i++; //needs to be random. works(no duplicate photo) if counter starts at 1. Too hacky for my liking (would eventually fail when we do random numbers)
-  fetch(`${AUTHORS_API}/${i}`)
-    .then(resp => resp.json())
-    .then(author => renderAuthor(author));
+const renderGame = () => {
+  landingPage.innerHTML = "";
+  API.init().then(data => getNewRound(data));
 };
 
-const renderAuthor = author => {
-
-  const imageContainerA = document.querySelector("#image-container-a")
-  const image = document.createElement("img");
-
-  // same author, doesn't work, how can i call quote.author_id?
+const getNewRound = data => {
+  console.log(data[0]);
+  console.log(i);
   
-  // if (author.id === author.quotes.author_id) {             
-  //     image.innerText = "Hello"
-  // } else {
-  //     image.src = author.img_url;
-  // }
 
-  image.src = author.img_url;
 
-  imageContainerA.append(image);
-};
+  const matchID = data => {
+    return data[0].quotes.map(quote => quote.author_id);
+  } 
 
-const renderQuote = quote => {
+  const timer = document.createElement('div')
+  timer.id = 'timer'
+  createTimer();
+
   const quoteCard = document.createElement("div");
   quoteCard.className = "card";
+
   const quoteContent = document.createElement("p");
-  quoteContent.innerText = quote.content;
-  
-  const authorImage = document.createElement("img")
-  authorImage.src = quote.author.img_url
+  // quoteContent.innerText = data[0].quotes.find(quote => quote.author_id)[i].content;
+  quoteContent.innerText = data[0].quotes.find(quote => quote.author_id === matchID(data)[i]).content
+
+  const imageA = document.createElement("img");
+  imageA.className = 'piccy'
+  imageA.src = data[0].authors.find(author => author.id === matchID(data)[i]).img_url;
+
 
 
   const imageContainerB = document.querySelector("#image-container-b")
@@ -77,11 +79,166 @@ const renderQuote = quote => {
   quoteCard.append(quoteContent);
   
  body.append(quoteCard, imageContainerB);
+  
+  
+  const imageB = document.createElement("img");
+  imageA.className = 'piccy'
+  let randomPick = Math.floor(Math.random() * data[0].authors.length)
+  imageB.src = data[0].authors[randomPick].img_url
+
+  imageContainerA.append(imageA);
+  quoteCard.append(quoteContent);
+  imageContainerB.append(imageB);
+  gameElements.append(timer, imageContainerA, quoteCard, imageContainerB);
+  
+  
+  const handleImageA = () => {
+    alert("Correct");
+    nextRound(imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB);
+  };
+  imageContainerA.addEventListener("click", handleImageA)
+
+  const handleImageB = () => {
+    alert("wrong");
+    nextRound(imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB);
+  };
+  imageContainerB.addEventListener("click", handleImageB)
+
 };
 
-const renderGame = () => {
-  landingPage.innerHTML = "";
-  API.getQuotes().then(quotes => singQuote(quotes));
-  API.getAuthors().then(authors => singAuthor(authors));
+const nextRound = (imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB) => {
+  console.log("next round", {imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB})
+  i++;
+
+  if (i === data[0].quotes.length) {
+    API.postGame("sam", 10, data[0].quotes.map(q => q.id))
+    return;
+  }
+
+  imageA.remove();
+  imageB.remove();
+  quoteCard.remove();
+  imageContainerA.removeEventListener("click", handleImageA);
+  imageContainerB.removeEventListener("click", handleImageB );
+  //remove event listeners
+  getNewRound(data);
 };
+
+
+const createTimer = () => {
+  const FULL_DASH_ARRAY = 283;
+  const WARNING_THRESHOLD = 10;
+  const ALERT_THRESHOLD = 5;
+
+  const COLOR_CODES = {
+    info: {
+      color: "green"
+    },
+    warning: {
+      color: "orange",
+      threshold: WARNING_THRESHOLD
+    },
+    alert: {
+      color: "red",
+      threshold: ALERT_THRESHOLD
+    }
+  };
+
+  const TIME_LIMIT = 10;
+  let timePassed = 0;
+  let timeLeft = TIME_LIMIT;
+  let timerInterval = null;
+  let remainingPathColor = COLOR_CODES.info.color;
+
+  document.getElementById("timer").innerHTML = `
+  <div class="base-timer">
+    <svg class="base-timer__svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <g class="base-timer__circle">
+        <circle class="base-timer__path-elapsed" cx="50" cy="50" r="45"></circle>
+        <path
+          id="base-timer-path-remaining"
+          stroke-dasharray="283"
+          class="base-timer__path-remaining ${remainingPathColor}"
+          d="
+            M 50, 50
+            m -45, 0
+            a 45,45 0 1,0 90,0
+            a 45,45 0 1,0 -90,0
+          "
+        ></path>
+      </g>
+    </svg>
+    <span id="base-timer-label" class="base-timer__label">${formatTime(
+      timeLeft
+    )}</span>
+  </div>
+  `;
+
+  startTimer();
+
+  function onTimesUp() {
+    clearInterval(timerInterval);
+  }
+
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      timePassed = timePassed += 1;
+      timeLeft = TIME_LIMIT - timePassed;
+      document.getElementById("base-timer-label").innerHTML = formatTime(
+        timeLeft
+      );
+      setCircleDasharray();
+      setRemainingPathColor(timeLeft);
+
+      if (timeLeft === 0) {
+        onTimesUp();
+      }
+    }, 1000);
+  }
+
+  function formatTime(time) {
+    const minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+
+    if (seconds < 5) {
+      seconds = `0${seconds}`;
+    }
+
+    return `${minutes}:${seconds}`;
+  }
+
+  function setRemainingPathColor(timeLeft) {
+    const { alert, warning, info } = COLOR_CODES;
+    if (timeLeft <= alert.threshold) {
+      document
+        .getElementById("base-timer-path-remaining")
+        .classList.remove(warning.color);
+      document
+        .getElementById("base-timer-path-remaining")
+        .classList.add(alert.color);
+    } else if (timeLeft <= warning.threshold) {
+      document
+        .getElementById("base-timer-path-remaining")
+        .classList.remove(info.color);
+      document
+        .getElementById("base-timer-path-remaining")
+        .classList.add(warning.color);
+    }
+  }
+
+  function calculateTimeFraction() {
+    const rawTimeFraction = timeLeft / TIME_LIMIT;
+    return rawTimeFraction - (1 / TIME_LIMIT) * (1 - rawTimeFraction);
+  }
+
+  function setCircleDasharray() {
+    const circleDasharray = `${(
+      calculateTimeFraction() * FULL_DASH_ARRAY
+    ).toFixed(0)} 283`;
+    document
+      .getElementById("base-timer-path-remaining")
+      .setAttribute("stroke-dasharray", circleDasharray);
+  }
+}
+
 renderLanding();
