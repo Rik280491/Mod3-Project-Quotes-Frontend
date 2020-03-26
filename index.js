@@ -8,7 +8,7 @@ const gameElements = document.querySelector("#game-elements");
 const landingPage = document.querySelector("#landing-page");
 const imageContainerB = document.querySelector("#image-container-b");
 const imageContainerA = document.querySelector("#image-container-a");
-const timer = document.querySelector('#timer')
+const timer = document.querySelector("#timer");
 
 let i = 0;
 
@@ -39,27 +39,31 @@ const getNewRound = data => {
 
   const matchID = data => {
     return data[0].quotes.map(quote => quote.author_id);
-  } 
+  };
 
-  const timer = document.createElement('div')
-  timer.id = 'timer'
-  createTimer();
+  const timer = document.createElement("div");
+  timer.id = "timer";
+  createTimer(data)
 
   const quoteCard = document.createElement("div");
   quoteCard.className = "card";
 
   const quoteContent = document.createElement("p");
   // quoteContent.innerText = data[0].quotes.find(quote => quote.author_id)[i].content;
-  quoteContent.innerText = data[0].quotes.find(quote => quote.author_id === matchID(data)[i]).content
+  quoteContent.innerText = data[0].quotes.find(
+    quote => quote.author_id === matchID(data)[i]
+  ).content;
 
   const imageA = document.createElement("img");
-  imageA.className = 'piccy'
-  imageA.src = data[0].authors.find(author => author.id === matchID(data)[i]).img_url;
+  imageA.className = "piccy";
+  imageA.src = data[0].authors.find(
+    author => author.id === matchID(data)[i]
+  ).img_url;
 
   const imageB = document.createElement("img");
-  imageA.className = 'piccy'
-  let randomPick = Math.floor(Math.random() * data[0].authors.length)
-  imageB.src = data[0].authors[randomPick].img_url
+  imageA.className = "piccy";
+  let randomPick = Math.floor(Math.random() * data[0].authors.length);
+  imageB.src = data[0].authors[randomPick].img_url;
 
   imageContainerA.append(imageA);
   quoteCard.append(quoteContent);
@@ -68,28 +72,34 @@ const getNewRound = data => {
 
   imageContainerA.addEventListener("click", () => {
     alert("Correct");
-    nextRound(imageA, imageB, quoteCard, imageContainerA, imageContainerB, data);
+    nextRound(
+      imageA,
+      imageB,
+      quoteCard,
+      imageContainerA,
+      imageContainerB,
+      data
+    );
   });
 
   imageContainerB.addEventListener("click", () => {
     alert("wrong");
-    nextRound(imageA, imageB, quoteCard, imageContainerA, imageContainerB, data);
+    nextRound(imageA,imageB,quoteCard,imageContainerA,imageContainerB,data);
   });
 };
 
-const nextRound = (imageA, imageB, quoteCard, imageContainerA, imageContainerB, data) => {
+const nextRound = (imageA,imageB,quoteCard,imageContainerA,imageContainerB,data) => {
   i++;
   imageA.remove();
   imageB.remove();
   quoteCard.remove();
-  imageContainerA.removeEventListener("click", getNewRound);
+  imageContainerA.removeEventListener("click", getNewRound );
   imageContainerB.removeEventListener("click", getNewRound );
   //remove event listeners
   getNewRound(data);
 };
 
-
-const createTimer = () => {
+const createTimer = (data) => {
   const FULL_DASH_ARRAY = 283;
   const WARNING_THRESHOLD = 10;
   const ALERT_THRESHOLD = 5;
@@ -144,7 +154,7 @@ const createTimer = () => {
     clearInterval(timerInterval);
   }
 
-  function startTimer() {
+  function startTimer(data) {
     timerInterval = setInterval(() => {
       timePassed = timePassed += 1;
       timeLeft = TIME_LIMIT - timePassed;
@@ -156,6 +166,8 @@ const createTimer = () => {
 
       if (timeLeft === 0) {
         onTimesUp();
+        getNewRound(data);
+
       }
     }, 1000);
   }
@@ -203,6 +215,7 @@ const createTimer = () => {
       .getElementById("base-timer-path-remaining")
       .setAttribute("stroke-dasharray", circleDasharray);
   }
+
 }
 
 renderLanding();
