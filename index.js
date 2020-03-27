@@ -1,221 +1,227 @@
-const START_GAME_API = "http://localhost:3000/start-game";
+const GET_ROUNDS_API = "http://localhost:3000/get-rounds";
+const GAMES_URL = "http://localhost:3000/games";
 
 const API = {
-  init: () => fetch(START_GAME_API).then(resp => resp.json())
+  init: () => fetch(GET_ROUNDS_API).then(resp => resp.json()),
+
+  getGames: () => fetch(GAMES_URL).then(response => response.json()),
+
+  postGame: (newGame) => {
+    fetch(GAMES_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify({game: newGame})
+  })
+  .then(response => response.json())
+}
 };
 
 const gameElements = document.querySelector("#game-elements");
 const landingPage = document.querySelector("#landing-page");
 const imageContainerB = document.querySelector("#image-container-b");
 const imageContainerA = document.querySelector("#image-container-a");
-const timer = document.querySelector("#timer");
+const finalPage = document.querySelector('#final_page')
+
+const table = document.createElement('table')
+table.className = 'center'
+const thScore = document.createElement('th')
 
 let i = 0;
+let score = 0;
 
 const renderLanding = () => {
+  
   const title = document.createElement("h1");
   title.class = "animated";
   title.innerText = "Who said it??";
 
   const gameBtn = document.createElement("button");
+  gameBtn.className = "big-button"
   gameBtn.innerText = "Start";
 
   gameBtn.addEventListener("click", () => {
-    renderGame();
+    renderGame(gameBtn, title);  
   });
 
-  landingPage.append(title, gameBtn);
+  const leadTitle = document.createElement('h3')
+  leadTitle.innerText = "leaderboard"
+
+  landingPage.append(title, gameBtn, leadTitle, table);
 };
 
 const renderGame = () => {
-  landingPage.innerHTML = "";
+  landingPage.remove()
   API.init().then(data => getNewRound(data));
 };
 
 const getNewRound = data => {
+  
   console.log(data[0]);
   console.log(i);
-  debugger;
-
-  const matchID = data => {
-    return data[0].quotes.map(quote => quote.author_id);
-  };
-
-  const timer = document.createElement("div");
-  timer.id = "timer";
-  createTimer(data)
 
   const quoteCard = document.createElement("div");
   quoteCard.className = "card";
 
   const quoteContent = document.createElement("p");
-  // quoteContent.innerText = data[0].quotes.find(quote => quote.author_id)[i].content;
-  quoteContent.innerText = data[0].quotes.find(
-    quote => quote.author_id === matchID(data)[i]
-  ).content;
+  quoteContent.innerText = data[i]["quote"]
 
   const imageA = document.createElement("img");
-  imageA.className = "piccy";
-  imageA.src = data[0].authors.find(
-    author => author.id === matchID(data)[i]
-  ).img_url;
+  imageA.className = 'piccy'
+  imageA.src = data[i]["author"].img_url
 
   const imageB = document.createElement("img");
-  imageA.className = "piccy";
-  let randomPick = Math.floor(Math.random() * data[0].authors.length);
-  imageB.src = data[0].authors[randomPick].img_url;
+  imageB.className = 'piccy'
+  imageB.src = data[i]["other_author"].img_url
 
   imageContainerA.append(imageA);
   quoteCard.append(quoteContent);
   imageContainerB.append(imageB);
-  gameElements.append(timer, imageContainerA, quoteCard, imageContainerB);
+  gameElements.append(imageContainerA, quoteCard, imageContainerB)
 
-  imageContainerA.addEventListener("click", () => {
-    alert("Correct");
-    nextRound(
-      imageA,
-      imageB,
-      quoteCard,
-      imageContainerA,
-      imageContainerB,
-      data
-    );
-  });
+  const handleImageA = () => {
+    // alert("Correct");
+    score++
+    nextRound(imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB);
+  };
 
-  imageContainerB.addEventListener("click", () => {
-    alert("wrong");
-    nextRound(imageA,imageB,quoteCard,imageContainerA,imageContainerB,data);
-  });
+  imageContainerA.addEventListener("click", handleImageA)
+  const handleImageB = () => {
+    // alert("wrong");
+    nextRound(imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB);
+  };
+
+  imageContainerB.addEventListener("click", handleImageB)
 };
 
-const nextRound = (imageA,imageB,quoteCard,imageContainerA,imageContainerB,data) => {
+const nextRound = (imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB) => {
+  console.log("next round", {imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB})
   i++;
   imageA.remove();
   imageB.remove();
   quoteCard.remove();
-  imageContainerA.removeEventListener("click", getNewRound );
-  imageContainerB.removeEventListener("click", getNewRound );
+  imageContainerA.removeEventListener("click", handleImageA);
+  imageContainerB.removeEventListener("click", handleImageB );
   //remove event listeners
-  getNewRound(data);
+  if (i <= (data.length - 1)) {
+    getNewRound(data);
+  // API.postGame("sam", 10, data.quotes.map(q => q.id))
+    // return;
+  } else {
+    renderEndPage()
+  }
 };
 
-const createTimer = (data) => {
-  const FULL_DASH_ARRAY = 283;
-  const WARNING_THRESHOLD = 10;
-  const ALERT_THRESHOLD = 5;
+const renderEndPage = (user) => {
+  console.log("rendering")
+  console.log(score)
 
-  const COLOR_CODES = {
-    info: {
-      color: "green"
-    },
-    warning: {
-      color: "orange",
-      threshold: WARNING_THRESHOLD
-    },
-    alert: {
-      color: "red",
-      threshold: ALERT_THRESHOLD
+  const gameOver = document.createElement('h1')
+  gameOver.className = 'animated'
+  gameOver.innerText = "Game Over!"
+
+  const scoreCard = document.createElement('div')
+  scoreCard.className = "card"
+
+  const scoreContent = document.createElement('h3')
+  scoreContent.innerText = `You got ${score}/10!`
+
+  const submitScore = document.createElement('button')
+  submitScore.innerText = "Submit Score"
+
+  const createUser = document.createElement("form")
+  const name = document.createElement("input")
+  name.name = "name"
+  name.placeholder = "name"
+
+  // endMessge = document.createElement('h5')
+  // endMessage.className = "animated"
+
+  const finalImage = document.createElement('img')
+  finalImage.className = 'finalPiccy'
+  // finalImage.src = "https://images.mentalfloss.com/sites/default/files/styles/insert_main_wide_image/public/ice-cream-poop.png"
+  if (score === 0 ) {
+    finalImage.src = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.giphy.com%2Fmedia%2F3og0IJHMqlmPzy7sGs%2Fgiphy.gif&f=1&nofb=1"
+  }
+  if (score === 1 ) {
+    finalImage.src = "https://images.mentalfloss.com/sites/default/files/styles/insert_main_wide_image/public/ice-cream-poop.png"
+  }
+  if (score === 2 ) {
+    finalImage.src = "https://media.tenor.com/images/2a977f69d4adc7b6879b904763012cac/tenor.gif"
+  }
+  if (score === 3 ) {
+    finalImage.src = "https://media.tenor.com/images/aa59ee31267aadab1fec222b537ace84/tenor.gif"
+  }
+  if (score === 4 ) {
+    finalImage.src = "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fcdn2.pu.nl%2Fmedia%2Fmisc2%2F7rjppjh.gif&f=1&nofb=1"
+  }
+  if (score === 5 ) {
+    finalImage.src = ""
+  }
+  if (score === 6 ) {
+    finalImage.src = "https://media.tenor.com/images/74c5d5848cfceb38323c79bdb0d078e2/tenor.gif"
+  }
+  if (score === 7 ) {
+    finalImage.src = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.giphy.com%2Fmedia%2FZmdErsWqppgMo%2Fgiphy.gif&f=1&nofb=1"
+  }
+  if (score === 8 ) {
+    finalImage.src = "https://media.tenor.com/images/f1cef839e5124661798cc567f5ca1aa3/tenor.gif"
+  }
+  if (score === 9 ) {
+    finalImage.src = "https://media.tenor.com/images/1408360eeb8f880c1d9a2420dd34e492/tenor.gif"
+  }
+  if (score === 10 ) {
+    finalImage.src = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.giphy.com%2Fmedia%2FTcdpZwYDPlWXC%2Fgiphy.gif&f=1&nofb=1"
+    
+  }
+
+  const leadTitlee = document.createElement('h3')
+  leadTitlee.innerText = "leaderboard"  
+
+  const message = document.createElement('h4')
+  message.className = 'animated'
+  message.innerText = "Don't like you score? Take it up with Rick on 07536937420 "
+
+  createUser.append(name, submitScore)
+  scoreCard.append(scoreContent);
+  gameElements.append(gameOver, scoreCard, createUser, finalImage, leadTitlee, table, message)
+
+  createUser.addEventListener("submit", event => {
+    newGame = {
+      username: event.target.elements.name.value,
+      score: score
     }
-  };
+    API.postGame(newGame)
+  });
 
-  const TIME_LIMIT = 10;
-  let timePassed = 0;
-  let timeLeft = TIME_LIMIT;
-  let timerInterval = null;
-  let remainingPathColor = COLOR_CODES.info.color;
-
-  document.getElementById("timer").innerHTML = `
-  <div class="base-timer">
-    <svg class="base-timer__svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <g class="base-timer__circle">
-        <circle class="base-timer__path-elapsed" cx="50" cy="50" r="45"></circle>
-        <path
-          id="base-timer-path-remaining"
-          stroke-dasharray="283"
-          class="base-timer__path-remaining ${remainingPathColor}"
-          d="
-            M 50, 50
-            m -45, 0
-            a 45,45 0 1,0 90,0
-            a 45,45 0 1,0 -90,0
-          "
-        ></path>
-      </g>
-    </svg>
-    <span id="base-timer-label" class="base-timer__label">${formatTime(
-      timeLeft
-    )}</span>
-  </div>
-  `;
-
-  startTimer();
-
-  function onTimesUp() {
-    clearInterval(timerInterval);
-  }
-
-  function startTimer(data) {
-    timerInterval = setInterval(() => {
-      timePassed = timePassed += 1;
-      timeLeft = TIME_LIMIT - timePassed;
-      document.getElementById("base-timer-label").innerHTML = formatTime(
-        timeLeft
-      );
-      setCircleDasharray();
-      setRemainingPathColor(timeLeft);
-
-      if (timeLeft === 0) {
-        onTimesUp();
-        getNewRound(data);
-
-      }
-    }, 1000);
-  }
-
-  function formatTime(time) {
-    const minutes = Math.floor(time / 60);
-    let seconds = time % 60;
-
-    if (seconds < 5) {
-      seconds = `0${seconds}`;
-    }
-
-    return `${minutes}:${seconds}`;
-  }
-
-  function setRemainingPathColor(timeLeft) {
-    const { alert, warning, info } = COLOR_CODES;
-    if (timeLeft <= alert.threshold) {
-      document
-        .getElementById("base-timer-path-remaining")
-        .classList.remove(warning.color);
-      document
-        .getElementById("base-timer-path-remaining")
-        .classList.add(alert.color);
-    } else if (timeLeft <= warning.threshold) {
-      document
-        .getElementById("base-timer-path-remaining")
-        .classList.remove(info.color);
-      document
-        .getElementById("base-timer-path-remaining")
-        .classList.add(warning.color);
-    }
-  }
-
-  function calculateTimeFraction() {
-    const rawTimeFraction = timeLeft / TIME_LIMIT;
-    return rawTimeFraction - (1 / TIME_LIMIT) * (1 - rawTimeFraction);
-  }
-
-  function setCircleDasharray() {
-    const circleDasharray = `${(
-      calculateTimeFraction() * FULL_DASH_ARRAY
-    ).toFixed(0)} 283`;
-    document
-      .getElementById("base-timer-path-remaining")
-      .setAttribute("stroke-dasharray", circleDasharray);
-  }
-
+  renderLeaderboard()
 }
 
+const renderLeaderboard = (user) => {
+  
+  const thUser = document.createElement('th')
+  const tr = document.createElement('tr')
+
+  thUser.innerText = `${user.user.name} - ${user.score}`
+
+  tr.append(thUser)
+  table.append(tr)
+
+  return table
+}
+
+ 
+
 renderLanding();
+
+API.getGames().then(users => singleGame(users))
+
+
+const singleGame = users => {
+  users.forEach(user => {
+    renderLeaderboard(user)
+  })
+}
+
