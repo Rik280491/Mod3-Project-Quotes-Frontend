@@ -1,21 +1,13 @@
 const GET_ROUNDS_API = "http://localhost:3000/get-rounds";
-<<<<<<< HEAD
-
-=======
->>>>>>> 9a43e0a61ac12d74e79fe3049653957116c5e043
 const GAMES_URL = "http://localhost:3000/games";
 
 const API = {
   init: () => fetch(GET_ROUNDS_API).then(resp => resp.json()),
-<<<<<<< HEAD
-  postGame: (username, score, quote_ids) => fetch(GAMES_URL, {
-=======
 
   getGames: () => fetch(GAMES_URL).then(response => response.json()),
 
   postGame: (newGame) => {
     fetch(GAMES_URL, {
->>>>>>> 9a43e0a61ac12d74e79fe3049653957116c5e043
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -38,11 +30,7 @@ table.className = 'center'
 const thScore = document.createElement('th')
 
 let i = 0;
-<<<<<<< HEAD
-let score = 1;
-=======
 let score = 0;
->>>>>>> 9a43e0a61ac12d74e79fe3049653957116c5e043
 
 const renderLanding = () => {
   
@@ -73,34 +61,11 @@ const getNewRound = data => {
   
   console.log(data[0]);
   console.log(i);
-<<<<<<< HEAD
-  
-
-  // const matchID = data => {
-  //   return data[0].quotes.map(quote => quote.author_id);
-  // } 
-
-  const timer = document.createElement('div')
-  timer.id = 'timer'
-  createTimer();
-=======
->>>>>>> 9a43e0a61ac12d74e79fe3049653957116c5e043
 
   const quoteCard = document.createElement("div");
   quoteCard.className = "card";
 
   const quoteContent = document.createElement("p");
-<<<<<<< HEAD
-  
-  quoteContent.innerText = data[i]["quote"]
-  
-  const imageA = document.createElement("img");
-  imageA.className = 'piccy'
-  imageA.src = data[i]["author"].img_url
-  
-  const imageB = document.createElement("img");
-  imageA.className = 'piccy'
-=======
   quoteContent.innerText = data[i]["quote"]
 
   const imageA = document.createElement("img");
@@ -109,27 +74,18 @@ const getNewRound = data => {
 
   const imageB = document.createElement("img");
   imageB.className = 'piccy'
->>>>>>> 9a43e0a61ac12d74e79fe3049653957116c5e043
   imageB.src = data[i]["other_author"].img_url
 
   imageContainerA.append(imageA);
   quoteCard.append(quoteContent);
   imageContainerB.append(imageB);
-<<<<<<< HEAD
-  gameElements.append(timer, imageContainerA, quoteCard, imageContainerB)
-  
-  //  debugger
-  const handleImageA = () => {
-    // alert("Correct");
-=======
   gameElements.append(imageContainerA, quoteCard, imageContainerB)
 
   const handleImageA = () => {
     // alert("Correct");
     score++
->>>>>>> 9a43e0a61ac12d74e79fe3049653957116c5e043
     nextRound(imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB);
-    score++
+    
   };
 
   imageContainerA.addEventListener("click", handleImageA)
@@ -143,75 +99,25 @@ const getNewRound = data => {
 
 const nextRound = (imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB) => {
   console.log("next round", {imageA, imageB, quoteCard, data, handleImageA, handleImageB, imageContainerA, imageContainerB})
-<<<<<<< HEAD
-  i++; 
-
-  
-
-=======
   i++;
->>>>>>> 9a43e0a61ac12d74e79fe3049653957116c5e043
   imageA.remove();
   imageB.remove();
   quoteCard.remove();
   imageContainerA.removeEventListener("click", handleImageA);
   imageContainerB.removeEventListener("click", handleImageB );
   //remove event listeners
-<<<<<<< HEAD
-  
-=======
->>>>>>> 9a43e0a61ac12d74e79fe3049653957116c5e043
   if (i <= (data.length - 1)) {
     getNewRound(data);
   // API.postGame("sam", 10, data.quotes.map(q => q.id))
     // return;
-<<<<<<< HEAD
-  }  else {
-=======
   } else {
->>>>>>> 9a43e0a61ac12d74e79fe3049653957116c5e043
     renderEndPage()
   }
 };
 
-<<<<<<< HEAD
-const renderEndPage = () => {
-  console.log("rendering")
-  console.log(score)
-  // score has to be 0+
-  // if score = 1, then score = 0
-  if (score === 1 ) {
-    score = 0
-    // scoreContent.innerText = "you thick piece oif shit"
-  }
-
-  const scoreCard = document.createElement('div')
-  scoreCard.className = "card"
-
-  const scoreContent = document.createElement('h3')
-  scoreContent.innerText = `You got ${score}/10!`
-
-  const submitScore = document.createElement('button')
-  submitScore.innerText = "Submit Score"
-  const createUser = document.createElement("form")
-  const username = document.createElement("input")
-  username.placeholder = "Enter Your Name"
-
-  createUser.append(username, submitScore)
-  scoreCard.append(scoreContent);
-  gameElements.append(scoreCard, createUser)
-  
-  createUser.addEventListener("submit", event => {
-    event.preventDefault(); 
-    API.postGame(username, score)
-  });
-}
-
-=======
 const renderEndPage = (user) => {
   console.log("rendering")
   console.log(score)
->>>>>>> 9a43e0a61ac12d74e79fe3049653957116c5e043
 
   const gameOver = document.createElement('h1')
   gameOver.className = 'animated'
