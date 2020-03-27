@@ -1,28 +1,80 @@
 body {
     text-align-last: center;
     font-family: monospace;
+    background-color: hotpink;
   }
 
 h1 {
     font-size: 3.5em;
     animation: pulse 1s infinite;
+    color: lime
+
+}
+
+h3 {
+  animation: tada 0.5s infinite;
+}
+
+h4 {
+  animation: flash 2s infinite
 }
 
 .card {
     text-align: center;
-    border: grey solid 1px;
+    border: limegreen solid 7px;
     padding: 1rem;
     width: auto;
     height: auto;
     display: center;
     margin: 1rem 1rem;
-    box-shadow: 3px 4px hotpink
+    box-shadow: 5px 7px indigo;
+    background-color: deeppink;
+    background-position: center;
+    animation: pulse 1s infinite
   }
 
 .piccy {
   justify-self: center;
   width: auto;
-  height: 20rem
+  height: 20rem;
+  border: cyan solid 7px;
+  animation: pulse 2s infinite
+}
+
+.finalPiccy {
+  background-size: 100%;
+  background-position: center;
+  width: 18rem;
+  padding: 2rem;
+  animation: pulse 0.5s infinite
+}
+
+.big-button {
+  border: yellow solid 5px;
+  background-color: aqua;
+  width: 250px;
+  height: 120px;
+  padding: 2rem;
+  animation: jello 1s infinite;
+  font-size: 4em;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+  animation: rubberBand 1s infinite;
+}
+
+button {
+  border: yellow solid 5px;
+  background-color: aqua;
+}
+
+.name {
+  border: aqua solid 5px;
+  background-color: yellow;
 }
 
 /* set height and width*/
