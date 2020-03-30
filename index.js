@@ -19,12 +19,13 @@ const API = {
 }
 };
 
-const gameElements = document.querySelector("#game-elements");
+const shuffle = document.querySelector("#shuffle");
 const landingPage = document.querySelector("#landing-page");
 const imageContainerB = document.querySelector("#image-container-b");
+const quoteContainer = document.querySelector("#quote")
 const imageContainerA = document.querySelector("#image-container-a");
 const finalPage = document.querySelector('#final_page')
-
+const endPage = document.querySelector("#end-page")
 const table = document.createElement('table')
 table.className = 'center'
 const thScore = document.createElement('th')
@@ -79,7 +80,17 @@ const getNewRound = data => {
   imageContainerA.append(imageA);
   quoteCard.append(quoteContent);
   imageContainerB.append(imageB);
-  gameElements.append(imageContainerA, quoteCard, imageContainerB)
+  quoteContainer.append(quoteCard)
+  shuffle.append(imageContainerA, imageContainerB)
+
+  //randomly append images 
+  const parent = document.getElementById("shuffle");
+  const divs = parent.children;
+  const frag = document.createDocumentFragment();
+  while (divs.length) {
+    frag.appendChild(divs[Math.floor(Math.random() * divs.length)]);
+  }
+  parent.appendChild(frag);
 
   const handleImageA = () => {
     // alert("Correct");
@@ -187,7 +198,7 @@ const renderEndPage = (user) => {
 
   createUser.append(name, submitScore)
   scoreCard.append(scoreContent);
-  gameElements.append(gameOver, scoreCard, createUser, finalImage, leadTitlee, table, message)
+  endPage.append(gameOver, scoreCard, createUser, finalImage, leadTitlee, table, message)
 
   createUser.addEventListener("submit", event => {
     newGame = {
