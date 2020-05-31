@@ -81,7 +81,7 @@ const getNewRound = data => {
   quoteCard.append(quoteContent);
   imageContainerB.append(imageB);
   quoteContainer.append(quoteCard)
-  shuffle.append(imageContainerA, imageContainerB)
+  shuffle.append(imageContainerA, quoteContainer, imageContainerB)
 
   //randomly append images 
   const parent = document.getElementById("shuffle");
@@ -170,7 +170,7 @@ const renderEndPage = (user) => {
     finalImage.src = "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fcdn2.pu.nl%2Fmedia%2Fmisc2%2F7rjppjh.gif&f=1&nofb=1"
   }
   if (score === 5 ) {
-    finalImage.src = ""
+    finalImage.src = "https://media.giphy.com/media/fDO2Nk0ImzvvW/giphy.gif"
   }
   if (score === 6 ) {
     finalImage.src = "https://media.tenor.com/images/74c5d5848cfceb38323c79bdb0d078e2/tenor.gif"
@@ -217,7 +217,7 @@ const renderLeaderboard = (user) => {
   const tr = document.createElement('tr')
 
   thUser.innerText = `${user.user.name} - ${user.score}`
-
+  
   tr.append(thUser)
   table.append(tr)
 
