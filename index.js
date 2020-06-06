@@ -236,7 +236,7 @@ const renderEndPage = (user) => {
 	const message = document.createElement("h4");
 	message.className = "animated";
 	message.innerText =
-		"Don't like you score? Take it up with Rick on 07536937420 ";
+		"Don't like your score? Take it up with Rik on 07536937420 ";
 
 	createUser.append(name, submitScore);
 	scoreCard.append(scoreContent);
